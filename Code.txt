@@ -1,0 +1,115 @@
+
+
+from bbio import *
+from BBIOServer import *
+import Adafruit_BBIO.GPIO as GPIO
+import Adafruit_BBIO.PWM as PWM
+import Adafruit_BBIO.ADC as ADC
+
+server = BBIOServer(1234)
+
+def ledState(led):
+        if (pinState(led)):
+                return 'on'
+        return 'off'
+def lockState(door):
+        if (pinState(door)):
+                return 'on'
+        return 'off'
+def bellState(db):
+        if (pinState(db)):
+                return 'on'
+        return 'off'
+
+def airState(fan):
+        if (pinState(fan)):
+                return 'on'
+        return 'off'
+
+def printEntry(text):
+        print "Text entered:\n  '%s'" % text
+
+def tsState(ts):
+        value=ADC.read("P9_40")
+        voltage=value*1800
+        ctemp=(voltage)/10
+        print "text entered:\n '%s'" % voltage
+        if(ctemp>25):
+                return 'on'
+        return 'off'
+def wl1State(wl):
+        if(pinState(wl));
+                 return 'on'
+        return 'off'
+def wl2State(wl):
+        if(pinState(wl));
+                 return 'on'
+        return 'off'
+def wl3State(wl):
+        if(pinState(wl));
+                 return 'on'
+        return 'off'
+def setup():
+        home = Page("Home",stylesheet="mobile.css")
+        home.add_text("This is a test of the BBIOServer library.")
+        home.add_entry(lambda entry_text: printEntry(entry_text), "Submit",     newline=True)
+        led = Page("Light Control")
+        led.add_text("This page allows control of the lights of house")
+        pinMode(GPIO1_30, OUTPUT)
+        led.add_button(lambda: toggle(GPIO1_30), "ON/OFF", newline=True)
+        delay(500)
+	led.add_monitor(lambda: ledState(GPIO1_30), "Current state:")
+
+
+
+#door of house
+        door = Page("Lock Control")
+        door.add_text("This page allows control of the lock of door")
+        pinMode(GPIO1_5, OUTPUT)
+        door.add_button(lambda: toggle(GPIO1_5), "OPEN/CLOSE", newline=True)
+        delay(500)
+        door.add_monitor(lambda: lockState(GPIO1_5), "Current state:")
+
+#fan of house
+        fan = Page("fan Control")
+        fan.add_text("This page allows control of the fan of door")
+
+        pinMode(GPIO1_4, OUTPUT)
+        fan.add_button(lambda: toggle(GPIO1_4), "ON/OFF", newline=True)
+        delay(500)
+        fan.add_monitor(lambda: airState(GPIO1_4), "Current state:")
+
+#bell of house
+        db = Page("ring bell")
+        db.add_text("This page rings the bell")
+
+        pinMode(GPIO1_1, OUTPUT)
+        db.add_button(lambda: toggle(GPIO1_1), "ON/OFF", newline=True)
+        delay(500)
+        db.add_monitor(lambda: bellState(GPIO1_1), "Current state:")
+
+#temperature sensor
+        ts = Page("temperature")
+        ts.add_text("This page displays the temperature content")
+        pinMode(GPIO1_0,OUTPUT)
+        ts.add_button(lambda: toggle(GPIO1_0), "ON/OFF", newline=True)
+        delay(500)
+        ts.add_monitor(lambda: tsState(GPIO1_0), "Current state:")
+
+#water level
+        wl=Page("water level")
+        led.add_text("This page allows control of the water level of house")
+        pinMode(GPIO1_26, OUTPUT)
+        pinMode(GPIO1_27, OUTPUT)
+        pinMode(GPIO1_28, OUTPUT)
+        wl.add_monitor(lambda: wl1State(GPIO1_26), "Current state:")
+        wl.add_monitor(lambda: wl2State(GPIO1_26), "Current state:")
+        wl.add_monitor(lambda: wl3State(GPIO1_26), "Current state:")
+
+
+
+        server.start(home,led,door,fan,db,ts)
+def loop():
+        stop()
+run(setup, loop)
+
